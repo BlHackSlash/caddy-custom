@@ -1,6 +1,6 @@
 # Build stage
-ARG CADDY_VERSION=latest
-FROM caddy:${CADDY_VERSION}-builder AS builder
+# Use 'caddy:builder' for the latest builder environment
+FROM caddy:builder AS builder
 
 # Build Caddy with all required modules
 RUN xcaddy build \
@@ -10,7 +10,8 @@ RUN xcaddy build \
     --with github.com/fvbommel/caddy-combine-ip-ranges
 
 # Final stage
-FROM caddy:${CADDY_VERSION}
+# Use 'caddy:latest' for the actual runtime
+FROM caddy:latest
 
 # Copy the custom-built Caddy binary
 COPY --from=builder /usr/bin/caddy /usr/bin/caddy
