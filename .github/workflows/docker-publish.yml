@@ -1,0 +1,35 @@
+name: Build and Push Custom Caddy
+
+# 1. When should this run?
+on:
+  schedule:
+    - cron: '0 0 * * 0' # Every Sunday at midnight UTC
+  workflow_dispatch:    # Adds a "Run workflow" button to the UI
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    # 2. Grant the action permission to write to your packages
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }} # GitHub provides this automatically
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          # REPLACE the placeholder below! Must be strictly lowercase.
+          tags: ghcr.io/blhackslash/caddy-custom:latest
